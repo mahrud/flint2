@@ -16,7 +16,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#if HAVE_CPU_SET_T
+#ifdef HAVE_CPU_SET_T
 #include <sched.h>
 #endif
 
@@ -47,7 +47,7 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
-#if HAVE_CPU_SET_T
+#ifdef HAVE_CPU_SET_T
     cpu_set_t original_affinity;
 #endif
     pthread_mutex_t mutex;
