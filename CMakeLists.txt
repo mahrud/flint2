@@ -8,8 +8,9 @@ include(CheckCCompilerFlag)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
+# See https://github.com/wbhart/flint2/pull/747#issuecomment-634140289
+set(CMAKE_C_STANDARD 90)
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_C_STANDARD 11)
 
 project(flint LANGUAGES C CXX)
 
