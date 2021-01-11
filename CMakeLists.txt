@@ -9,6 +9,10 @@ include(CheckCSourceRuns)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
+# See https://github.com/wbhart/flint2/pull/747#issuecomment-634140289
+set(CMAKE_C_STANDARD 90)
+set(CMAKE_CXX_STANDARD 11)
+
 project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
@@ -19,6 +23,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 option(BUILD_SHARED_LIBS "Build shared libs" on)
+option(WITH_MPIR "Build with MPIR or not" off)
 option(WITH_NTL "Build with NTL or not" off)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure" CONFIGURE_CONTENTS)
@@ -29,10 +34,16 @@ set(FLINT_MINOR ${CMAKE_MATCH_1})
 string(REGEX MATCH "FLINT_PATCH=([0-9]*)" _ ${CONFIGURE_CONTENTS})
 set(FLINT_PATCH ${CMAKE_MATCH_1})
 
-find_package(GMP REQUIRED)
-find_package(MPFR REQUIRED)
-if (WITH_NTL)
-    find_package(NTL REQUIRED)
+if(WITH_MPIR)
+  find_package(MPIR 3.0.0 REQUIRED)
+  set(GMP_LIBRARIES ${MPIR_LIBRARIES})
+  set(GMP_INCLUDE_DIRS ${MPIR_INCLUDE_DIRS})
+else()
+  find_package(GMP 6.0.0 REQUIRED)
+endif()
+find_package(MPFR 4.0.1 REQUIRED)
+if(WITH_NTL)
+    find_package(NTL 10.5.0 REQUIRED)
 endif()
 find_package(PythonInterp REQUIRED)
 
@@ -222,7 +233,7 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
+    ${NTL_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
 if(FLINT_USES_BLAS)
